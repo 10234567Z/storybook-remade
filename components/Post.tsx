@@ -152,7 +152,7 @@ export default function Post({ post, currentUserId, isGuest }: { post: Post; cur
           </div>
         </div>
       ) : (
-        <p className="text-gray-700 dark:text-gray-300 mb-4">{post.content}</p>
+        <p className="text-gray-700 dark:text-gray-300 mb-4 break-words">{post.content}</p>
       )}
       {post.image_url && <img src={signedUrl!} alt="Post image" className="w-full h-[500px] rounded-lg mb-2 object-cover" />}
       <div className="flex items-center text-gray-500 dark:text-gray-400">

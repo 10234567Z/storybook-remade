@@ -29,6 +29,7 @@ export default function Comments({ postId }: { postId: string }) {
   const [editContent, setEditContent] = useState('')
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [avaUrl, setAvaUrl] = useState(null as string | null)
+  const [currentUserDisplayName, setCurrentUserDisplayName] = useState<string | null>(null)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
@@ -72,14 +73,14 @@ export default function Comments({ postId }: { postId: string }) {
   const fetchCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    console.log(user.user_metadata.avatar_url)
+    setCurrentUser(user)
+    setCurrentUserDisplayName(user.user_metadata.display_name)
     const { data: avaUrl , error } = await supabase.storage.from('avatar-images').createSignedUrl(user.user_metadata.avatar_url, 3600)
     if (error) {
       console.error('Error fetching signed url:', error)
     } else {
       setAvaUrl(avaUrl.signedUrl)
     }
-    setCurrentUser(user)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,7 +97,16 @@ export default function Comments({ postId }: { postId: string }) {
       console.error('Error creating comment:', error)
     } else {
       setNewComment('')
-      setComments(prevComments => [data, ...prevComments])
+      setComments(prevComments => [
+        {
+          ...data,
+          user: {
+            displayname: currentUser.user_metadata.display_name,
+            avatarurl: currentUser.user_metadata.avatar_url
+          }
+        },
+        ...prevComments
+      ])
     }
   }
 
@@ -160,10 +170,10 @@ export default function Comments({ postId }: { postId: string }) {
               <div className="flex items-center">
                 <img
                   src={avaUrl || 'https://via.placeholder.com/40'}
-                  alt={comment.user.displayname || "User"}
+                  alt={currentUserDisplayName!}
                   className="w-8 h-8 rounded-full mr-2 object-cover"
                 />
-                <span className="font-semibold">{comment.user.displayname}</span>
+                <span className="font-semibold">{currentUserDisplayName}</span>
               </div>
               {currentUser && currentUser.id === comment.user_id && (
                 <div className="relative group">
