@@ -35,25 +35,6 @@ export default function Comments({ postId }: { postId: string }) {
   useEffect(() => {
     fetchComments()
     fetchCurrentUser()
-
-    const channel = supabase
-      .channel('realtime comments')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'comments', filter: `post_id=eq.${postId}` }, payload => {
-        if (payload.eventType === 'INSERT') {
-          setComments(prevComments => [payload.new as Comment, ...prevComments])
-        } else if (payload.eventType === 'DELETE') {
-          setComments(prevComments => prevComments.filter(comment => comment.id !== payload.old.id))
-        } else if (payload.eventType === 'UPDATE') {
-          setComments(prevComments => prevComments.map(comment => 
-            comment.id === payload.new.id ? { ...comment, ...payload.new as Comment } : comment
-          ))
-        }
-      })
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
   }, [postId, supabase])
 
   const fetchComments = async () => {
@@ -97,36 +78,26 @@ export default function Comments({ postId }: { postId: string }) {
       console.error('Error creating comment:', error)
     } else {
       setNewComment('')
-      setComments(prevComments => [
-        {
-          ...data,
-          user: {
-            displayname: currentUser.user_metadata.display_name,
-            avatarurl: currentUser.user_metadata.avatar_url
-          }
-        },
-        ...prevComments
-      ])
+      setComments(prevComments => [data, ...prevComments])
     }
   }
 
   const handleEdit = async (commentId: string) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('comments')
       .update({ content: editContent })
       .eq('id', commentId)
       .select()
+      .single()
 
     if (error) {
       console.error('Error updating comment:', error)
     } else {
       setEditingComment(null)
       setEditContent('')
-
-      // Edits in UI
-        setComments(prevComments => prevComments.map(comment => 
-            comment.id === commentId ? { ...comment, content: editContent } : comment
-        ))
+      setComments(prevComments => prevComments.map(comment => 
+        comment.id === commentId ? { ...comment, content: editContent } : comment
+      ))
     }
   }
 
@@ -136,11 +107,10 @@ export default function Comments({ postId }: { postId: string }) {
       .delete()
       .eq('id', commentId)
 
-    // removes from UI
-    setComments(prevComments => prevComments.filter(comment => comment.id !== commentId))
-
     if (error) {
       console.error('Error deleting comment:', error)
+    } else {
+      setComments(prevComments => prevComments.filter(comment => comment.id !== commentId))
     }
   }
 

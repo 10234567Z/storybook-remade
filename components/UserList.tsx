@@ -10,11 +10,16 @@ interface User {
   avatarurl: string;
 }
 
+interface avaList {
+  url: string;
+  userId: string;
+}
+
 export default function UserList({ currentUserId }: { currentUserId: string }) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasConversations, setHasConversations] = useState(false);
-  const [avaUrls, setAvaUrls] = useState<string[]>([]);
+  const [avaUrls, setAvaUrls] = useState<avaList[]>([]);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
@@ -48,7 +53,7 @@ export default function UserList({ currentUserId }: { currentUserId: string }) {
             if (error) {
               console.error("Error fetching signed URL:", error);
             } else {
-              setAvaUrls((prev) => [...prev, data.signedUrl]);
+              setAvaUrls((prev) => [...prev, { url: data.signedUrl, userId: user.id }]);
             }
           })
         );
@@ -72,7 +77,7 @@ export default function UserList({ currentUserId }: { currentUserId: string }) {
             if (error) {
               console.error("Error fetching signed URL:", error);
             } else {
-              setAvaUrls((prev) => [...prev, data.signedUrl]);
+              setAvaUrls((prev) => [...prev, { url: data.signedUrl, userId: user.id }]);
             }
           })
         );
@@ -95,7 +100,7 @@ export default function UserList({ currentUserId }: { currentUserId: string }) {
             className="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow duration-200"
           >
             <img
-              src={user.avatarurl ? avaUrls[index] : "https://via.placeholder.com/40"}
+              src={avaUrls.find((ava) => ava.userId === user.id)?.url || "https://via.placeholder.com/40"}
               alt={user.displayname}
               className="w-10 h-10 rounded-full mr-3 object-cover"
             />

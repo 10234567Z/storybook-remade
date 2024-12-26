@@ -18,9 +18,15 @@ interface FollowListProps {
   isGuest: boolean;
 }
 
+
+interface avaList {
+  url: string;
+  userId: string;
+}
+
 export default function FollowList({ username, listType, currentUserId, isGuest }: FollowListProps) {
   const [users, setUsers] = useState<User[]>([]);
-  const [avaUrls, setAvaUrls] = useState<string[]>([]);
+  const [avaUrls, setAvaUrls] = useState<avaList[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClientComponentClient();
@@ -63,7 +69,7 @@ export default function FollowList({ username, listType, currentUserId, isGuest 
           if (avaError) {
             console.error("Error fetching signed url:", avaError);
           } else {
-            setAvaUrls((prevAvaUrls) => [...prevAvaUrls, avaData.signedUrl]);
+            setAvaUrls((prev) => [...prev, { url: avaData.signedUrl, userId: follow[listType === "followers" ? "follower" : "following"].id }]);
           }
         })
       );
@@ -86,7 +92,7 @@ export default function FollowList({ username, listType, currentUserId, isGuest 
         <div key={user.id} className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
           <Link href={`/profile/${user.displayname}`} className="flex items-center">
             <img
-              src={ user.avatarurl ? avaUrls[index] : "https://via.placeholder.com/40"}
+              src={avaUrls.find((ava) => ava.userId === user.id)?.url || "https://via.placeholder.com/40"} 
               alt={user.displayname}
               className="w-10 h-10 rounded-full mr-4 object-cover"
             />
