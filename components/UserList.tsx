@@ -93,7 +93,7 @@ export default function UserList({ currentUserId }: { currentUserId: string }) {
   return (
     <div className="space-y-4">
       {hasConversations ? (
-        users.map((user, index) => (
+        users.map((user) => (
           <Link
             key={user.id}
             href={`/messages/${user.displayname}`}

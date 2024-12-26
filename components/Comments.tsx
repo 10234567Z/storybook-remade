@@ -83,7 +83,7 @@ export default function Comments({ postId }: { postId: string }) {
   }
 
   const handleEdit = async (commentId: string) => {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('comments')
       .update({ content: editContent })
       .eq('id', commentId)

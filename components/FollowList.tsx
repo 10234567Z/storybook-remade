@@ -88,7 +88,7 @@ export default function FollowList({ username, listType, currentUserId, isGuest 
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold mb-4">{listType === "followers" ? "Followers" : "Following"}</h2>
-      {users.map((user, index) => (
+      {users.map((user) => (
         <div key={user.id} className="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
           <Link href={`/profile/${user.displayname}`} className="flex items-center">
             <img
