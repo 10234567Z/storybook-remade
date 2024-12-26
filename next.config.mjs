@@ -1,8 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-    eslint: {
-        quiet: true,
-    },
-};
+const nextConfig = {};
 
 export default nextConfig;
