@@ -160,7 +160,7 @@ export default function Comments({ postId }: { postId: string }) {
               <div className="flex items-center">
                 <img
                   src={avaUrl || 'https://via.placeholder.com/40'}
-                  alt={comment.user.displayname}
+                  alt={comment.user.displayname || "User"}
                   className="w-8 h-8 rounded-full mr-2 object-cover"
                 />
                 <span className="font-semibold">{comment.user.displayname}</span>

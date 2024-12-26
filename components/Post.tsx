@@ -5,16 +5,17 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
 import { Heart } from "react-feather";
 import { Edit2, MessageCircle, Trash2 } from "lucide-react";
+import Comments from "./Comments";
 
 interface Post {
-  id: string
-  user_id: string
-  content: string
-  created_at: string
-  image_url: string
-  users: { displayname: string; avatarurl: string }
-  likes: { user_id: string }[]
-  comments: { id: string }[]
+  id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  image_url: string;
+  users: { displayname: string; avatarurl: string };
+  likes: { user_id: string }[];
+  comments: { id: string }[];
 }
 
 export default function Post({ post, currentUserId, isGuest }: { post: Post; currentUserId: string; isGuest: boolean }) {
@@ -172,6 +173,7 @@ export default function Post({ post, currentUserId, isGuest }: { post: Post; cur
           <span>{comments}</span>
         </button>
       </div>
+      {showComments && <Comments postId={post.id} />}
       {isGuest && <p className="text-sm text-gray-500 mt-2">Guest users cannot like or comment on posts</p>}
     </div>
   );
